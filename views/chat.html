@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+      
+        <title>Socket.IO Chat</title>
+        <style>
+        </style>
+            <script src="/socket.io/socket.io.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="center text-uppercase" id="welcomeUser">Awesome Chat App</h1>
+            <div>
+                <a class="btn btn-primary btn-lg" href="/">Logout</a>
+            </div>
+            <div id="error-container"></div>
+            <div class="form_style test-center">
+                <h3 class="center">Please choose Private or Group Chatting!</h3>
+                <div class="center">
+                    <button onclick='privateChat()' class="btn btn-primary">Private Chat</button>
+                    <button onclick='groupChat()' class="btn btn-success">Group Chat</button>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    <script>
+
+        // Send message to selected room 
+        function privateChat() {
+            window.location.replace("http://localhost:3000/private_chat")
+        }
+
+
+        function groupChat(){
+            window.location.replace("http://localhost:3000/group_chat") 
+        }
+
+    </script>
+
+
+</html>

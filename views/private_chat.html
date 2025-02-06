@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+      
+        <title>Private Chat</title>
+        <style>
+        </style>
+            <script src="/socket.io/socket.io.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="center text-uppercase" id="welcomeUser">Private Chat Room @ Awesome Chat App</h1>
+            <div>
+                <a class="btn btn-primary btn-lg" href="/">Logout</a>
+            </div>
+            <div id="error-container"></div>
+            <div class="form_style test-center">
+                <h3 id="h3line"></h3>
+                <h3 class="center">Please choose a user and start chatting!</h3>
+                <div class="form-group mb-3">
+                    <label class="form-label" for="password">Select user: </label>
+                    <select name="users" id="users">
+                    </select>
+                </div>
+                <div class="center">
+                    <button onclick="joinPrivateChat()" class="btn btn-success">Join Private Chat</button>
+                    <button onclick="leavePrivateChat()" class="btn btn-danger">Leave Private Chat</button>
+
+                </div>
+                <h1 id="userName"></h1>
+                <br/>
+
+                <div class="form-outline mb-4">
+                    <textarea type="text" id="userMessage" value="" name="userMessage"
+                        class="form-control form-control-lg"></textarea>
+                    <button class="btn btn-dark btn-block btn-lg" id="send" onClick="sendMessage()">Send message</button>
+                </div>
+                <div id="outer-container">
+                    <h4>Chat Box</h4>
+                    <div id="message-container"></div>
+                </div>
+                <div id="user-typing"></div>
+            </div>
+        </div>
+    </body>
+
+    <script>
+        username = getCookie('username')
+
+        document.getElementById("h3line").innerHTML = "Welcome " + username + "!"
+
+        to_username = getCookie('to_username')
+        document.getElementById("welcomeUser").innerHTML = to_username?username + " privately chatting with " + to_username + "!":" "
+        // Username Validation 
+        if(username==''){
+            console.log('user not logged in')
+            window.location.replace("http://localhost:3000")
+        }
+
+        fetch('http://localhost:3000/users')
+        .then(response => {
+            if(response.ok){
+                return response.json();
+            }else{
+                throw new Error('API request failed');
+            }
+        })
+        .then(data => {
+            console.log(data.length)
+            for(var i=0; i<data.length; i++){
+                document.getElementById("users").innerHTML += `<option value=${data[i]['username']}>${data[i]['username']}</option>`
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        })
+
+
+        //console.log(document.getElementById("users").value)
+
+        //users = window.location.replace("")
+
+        const ioClient = io()
+
+        ioClient.on('welcome', (message) => {
+            addMessage(message)
+        })
+
+        ioClient.on('newMessage', (message) => {
+            addMessage(message)
+        })
+
+        // Join private chat
+        function joinPrivateChat(){
+            let userNameH = document.getElementById('userName')
+            let userNameDropdown = document.getElementById('users')
+            console.log(userNameDropdown)
+            let to_username = userNameDropdown.options[userNameDropdown.selectedIndex].value
+            userNameH.innerHTML  = username + " private chatting with " + to_username;
+            ioClient.emit('join_user', to_username);
+        }
+
+        // Leave private chat
+        function leavePrivateChat(){
+            document.getElementById('userName').innerHTML = ''
+            document.getElementById('message-container').innerHTML = ''
+            // send disconnect
+            ioClient.emit('leave_user',to_username)
+        }
+
+
+        // Send message to selected room 
+        function sendMessage() {
+            console.log("cookie:",decodeURIComponent(document.cookie))
+
+            const txtmessage = document.getElementById('userMessage');
+            const message = txtmessage.value; 
+
+            // const data = {
+            //     group: document.querySelector('#users')[document.querySelector('#users').selectedIndex].value,
+            //     message
+            // }
+
+            const data = {
+                username: username, 
+                to_username: document.querySelector('#users')[document.querySelector('#users').selectedIndex].value,
+                message: message
+            }
+            console.log(data.username)
+            console.log(data.to_username)
+
+            document.getElementById("message-container").innerHTML += `<div> ${username} ": " ${message}`
+
+            ioClient.emit('messageUser', data) // message for private chat
+
+
+            // if(message != ''){
+            //     var userName = document.getElementById('userName').innerHTML
+            //     messageSend = {
+            //         user: userName,
+            //         message: message,
+            //         username: username
+            //     }
+            //     console.log("Message send"+messageSend)
+            //     client.emit('messageUser', messageSend)
+            //     addMessage(messageSend)
+            //     message.value=''
+            // }
+        }
+
+        function addMessage(message){
+            document.getElementById('message-container').innerHTML += `<div> ${message.username}: ${message.message} </div>`
+        }
+
+
+        function getCookie(cookieName) {
+            let name = cookieName + "=";
+
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+            for(let i=0; i< ca.length; i++){
+                let c = ca[i];
+                while(c.charAt(0) == ' '){
+                    c = c.substring(1);
+                }
+                if(c.indexOf(name) == 0){
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+    </script>
+
+
+</html>

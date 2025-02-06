@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+      
+        <title>Socket.IO Chat</title>
+        <style>
+        </style>
+            <script src="/socket.io/socket.io.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="center text-uppercase" id="welcomeUser">Group Chatroom @ Awesome Chat App</h1>
+            <div>
+                <a class="btn btn-primary btn-lg" href="/">Logout</a>
+            </div>
+            <div id="error-container"></div>
+            <div class="form_style test-center">
+                <h3 id="h3line"></h3>
+
+                <h3 class="center">Please choose a room and start chatting!</h3>
+                <div class="form-group mb-3">
+                    <label class="form-label" for="password">Select room: </label>
+                    <select name="rooms" id="rooms">
+                        <option value="devops">DevOps</option>
+                        <option value="cloudcomputing">Cloud Computing</option>
+                        <option value="covid19">Covid-19</option>
+                        <option value="sports">Sports</option>
+                        <option value="nodeJS">NodeJS</option>
+                    </select>
+                </div>
+                <div class="center">
+                    <button onclick="joinRoom()" class="btn btn-success">Join Room</button>
+                    <button onclick="leaveRoom()" class="btn btn-danger">Leave Room</button>
+
+                </div>
+                <h1 id="roomName"></h1>
+                <br/>
+
+                <div class="form-outline mb-4">
+                    <textarea type="text" id="roomMessage" value="" name="roomMessage"
+                        class="form-control form-control-lg"></textarea>
+                    <button class="btn btn-dark btn-block btn-lg" id="send" onClick="sendMessage()">Send message</button>
+                </div>
+                <div id="outer-container">
+                    <h4>Chat Box</h4>
+                    <div id="message-container"></div>
+                </div>
+                <div id="user-typing"></div>
+            </div>
+        </div>
+    </body>
+
+    <script>
+        username = getCookie('username')
+        document.getElementById("h3line").innerHTML = "Welcome " + username + "!"
+        // Username Validation 
+        if(username==''){
+            console.log('user not logged in')
+            window.location.replace("http://localhost:3000")
+        }
+
+        const ioClient = io()
+
+        ioClient.on('welcome', (message) => {
+            addMessage(message)
+        })
+
+        ioClient.on('newMessage', (message) => {
+            addMessage(message)
+        })
+
+        // Send message to selected room 
+        function sendMessage() {
+            const txtmessage = document.getElementById('roomMessage')
+
+            const message = txtmessage.value
+
+            const data = {
+                username: username,
+                room: document.querySelector('#rooms')[document.querySelector('#rooms').selectedIndex].value,
+                message
+            }
+
+            console.log("rn",data.room)
+
+            ioClient.emit("messageRoom", data);
+
+
+            // if(message != ''){
+            //     var roomName = document.getElementById('roomName').innerHTML
+            //     messageSend = {
+            //         room: roomName,
+            //         message: message,
+            //         username: username
+            //     }
+            //     console.log("Message send"+messageSend)
+            //     ioClient.emit('messageRoom', messageSend)
+            //     addMessage(messageSend)
+            //     message.value=''
+            // }
+        }
+
+        function addMessage(message){
+            document.getElementById('message-container').innerHTML += `<div> ${message.username}: ${message.message} </div>`
+        }
+
+        function joinRoom(){
+            let roomNameH = document.getElementById('roomName')
+            let roomNameDropdown = document.getElementById('rooms')
+            let roomName = roomNameDropdown.options[roomNameDropdown.selectedIndex].value
+            roomNameH.innerHTML = "<b>" + username + "</b> group chatting at <b>" + roomNameDropdown.options[roomNameDropdown.selectedIndex].text + "</b>"
+            ioClient.emit('joinRoom',roomName)
+        }
+
+        function leaveRoom(){
+            document.getElementById('roomName').innerHTML = ''
+            document.getElementById('message-container').innerHTML = ''
+            console.log("lrd:",document.querySelector('#rooms')[document.querySelector('#rooms').selectedIndex].value)
+            // send disconnect
+            ioClient.emit('leaveRoom',document.querySelector('#rooms')[document.querySelector('#rooms').selectedIndex].value)
+        }
+
+        function getCookie(cookieName) {
+            let name = cookieName + "=";
+
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+            for(let i=0; i< ca.length; i++){
+                let c = ca[i];
+                while(c.charAt(0) == ' '){
+                    c = c.substring(1);
+                }
+                if(c.indexOf(name) == 0){
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+    </script>
+
+
+</html>

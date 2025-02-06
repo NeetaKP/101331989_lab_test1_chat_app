@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <title>Socket.IO Chat</title>
+        <style>
+
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1 class="center">Awesome Chat App</h1>
+            <Form class="form_style needs-validation" novalidate method="POST" action="http://localhost:3000/signup">
+                <h3 class="center">Sign Up</h3>
+                <div class="'form-group mb-3">
+                    <label for="username">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required />
+                    <div class="invalid-feedback">
+                        Please enter a username.
+                    </div>
+
+
+                </div>
+                <div class="form-group mb-3">
+                    <label for="firstname">First Name</label>
+                    <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Enter first name" required/>
+                    <div class="invalid-feedback">
+                        Please enter your first name
+                    </div>
+                </div>
+                <div class='form-group mb-3'>
+                    <label for="lastname">Last Name</label>
+                    <input type='text' class='form-control' id='lastname' name='lastname' placeholder='Enter last name' required></input>
+                    <div class="invalid-feedback">
+                        Please enter your last name.
+                    </div>
+                </div>
+                <div class='form-group mb-3'>
+                    <label for="password">Password</label>
+                    <input type='password' class='form-control' id='password' name='password' placeholder='Enter password' required></input>
+                    <div class="invalid-feedback">
+                        Please enter a password.
+                    </div>
+                </div>
+                <div class='center'>
+                    <Button class="btn btn-success" type="submit">Submit</Button>
+                </div>
+    
+            </Form>
+            <div class="container link_style">
+                <p>Already have an account? <a href='/'>Login</a> here</p>
+            </div>
+
+        </div>
+    </body>
+    <script>
+        (function() {
+            'use strict'
+
+            var forms = document.querySelectorAll('.needs-validation')
+
+            Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if(!form.checkValidity()){
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        }) ()
+    </script>
+</html>
