@@ -19,8 +19,8 @@ const PrivateMsgModel = require('./models/PrivateMsgs')
 
 // database 
 const DB_CONN = "mongodb+srv://neetukoirala:as3uwJdBaAZkt2xX@cluster0.thpsb.mongodb.net/labtest-01?retryWrites=true&w=majority&appName=Cluster0"
-//const DB_PASSWORD = "mtvVr5urcPised3r"
-//const DB_CONN = `mongodb+srv://jeevankpant:${DB_PASSWORD}@cluster0.4v1rh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
+
+
 mongoose.connect(DB_CONN, {
     useNewUrlParser:true,
     useUnifiedTopology:true
